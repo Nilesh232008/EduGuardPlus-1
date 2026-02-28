@@ -1,8 +1,8 @@
 // src/components/index.js
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View, Text, TouchableOpacity, ActivityIndicator,
-  StyleSheet, ScrollView,
+  StyleSheet, ScrollView, Modal, TextInput,
 } from 'react-native';
 import { COLORS, SIZES, SHADOWS, FONTS } from '../constants/theme';
 
@@ -20,7 +20,12 @@ export const ErrorBox = ({ message }) => (
     <Text style={styles.errorText}>⚠️  {message}</Text>
   </View>
 );
-
+// ─── SuccessBox ───────────────────────────────────────────────────────────
+export const SuccessBox = ({ message }) => (
+  <View style={styles.successBox}>
+    <Text style={styles.successText}>✓ {message}</Text>
+  </View>
+);
 // ─── Card ─────────────────────────────────────────────────────────────────────
 export const Card = ({ children, style }) => (
   <View style={[styles.card, style]}>{children}</View>
@@ -111,7 +116,67 @@ export const NoticeCard = ({ title, message, createdBy, createdAt }) => (
     </Text>
   </Card>
 );
+// ─── TextInputField ──────────────────────────────────────────────────────────
+export const TextInputField = ({ label, placeholder, value, onChangeText, multiline = false }) => (
+  <View style={styles.inputContainer}>
+    {label && <Text style={styles.inputLabel}>{label}</Text>}
+    <TextInput
+      style={[styles.textInput, multiline && { minHeight: 80 }]}
+      placeholder={placeholder}
+      value={value}
+      onChangeText={onChangeText}
+      multiline={multiline}
+      placeholderTextColor={COLORS.medium}
+    />
+  </View>
+);
 
+// ─── ModalForm ───────────────────────────────────────────────────────────────
+export const ModalForm = ({ visible, title, onClose, onSubmit, loading, children }) => (
+  <Modal
+    visible={visible}
+    transparent
+    animationType="slide"
+    onRequestClose={onClose}
+  >
+    <View style={styles.modalOverlay}>
+      <View style={styles.modalContent}>
+        <View style={styles.modalHeader}>
+          <Text style={styles.modalTitle}>{title}</Text>
+          <TouchableOpacity onPress={onClose} style={styles.modalCloseBtn}>
+            <Text style={styles.modalCloseText}>✕</Text>
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView style={styles.modalBody}>
+          {children}
+        </ScrollView>
+
+        <View style={styles.modalFooter}>
+          <TouchableOpacity
+            style={[styles.secondaryBtn]}
+            onPress={onClose}
+            disabled={loading}
+          >
+            <Text style={styles.secondaryBtnText}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.primaryBtn]}
+            onPress={onSubmit}
+            disabled={loading}
+            activeOpacity={0.8}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.primaryBtnText}>💾 Save</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  </Modal>
+);
 // ─── Styles ──────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.background },
@@ -119,6 +184,9 @@ const styles = StyleSheet.create({
 
   errorBox: { backgroundColor: '#FEF2F2', borderRadius: SIZES.radiusSm, padding: 12, margin: 16, borderLeftWidth: 4, borderLeftColor: COLORS.danger },
   errorText: { color: COLORS.danger, fontSize: SIZES.md },
+
+  successBox: { backgroundColor: '#F0FDF4', borderRadius: SIZES.radiusSm, padding: 12, margin: 16, borderLeftWidth: 4, borderLeftColor: COLORS.success },
+  successText: { color: COLORS.success, fontSize: SIZES.md },
 
   card: { backgroundColor: COLORS.card, borderRadius: SIZES.radius, padding: 14, marginBottom: 12, ...SHADOWS.card },
 
@@ -156,4 +224,86 @@ const styles = StyleSheet.create({
   noticeTitle: { fontSize: SIZES.md, fontWeight: FONTS.bold, color: COLORS.dark },
   noticeMsg:   { fontSize: SIZES.sm, color: COLORS.medium, marginTop: 4 },
   noticeMeta:  { fontSize: SIZES.xs, color: COLORS.medium, marginTop: 8 },
-});
+
+  inputContainer: { marginBottom: 14 },
+  inputLabel: { fontSize: SIZES.sm, fontWeight: FONTS.semiBold, color: COLORS.dark, marginBottom: 6 },
+  textInput: {
+    backgroundColor: COLORS.card,
+    borderRadius: SIZES.radiusSm,
+    padding: 12,
+    color: COLORS.dark,
+    fontSize: SIZES.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: COLORS.background,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '90%',
+  },
+  modalHeader: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: SIZES.lg,
+    fontWeight: FONTS.bold,
+    color: COLORS.dark,
+  },
+  modalCloseBtn: {
+    padding: 8,
+  },
+  modalCloseText: {
+    fontSize: SIZES.lg,
+    color: COLORS.medium,
+  },
+  modalBody: {
+    padding: 16,
+  },
+  modalFooter: {
+    flexDirection: 'row',
+    gap: 12,
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+  },
+  secondaryBtn: {
+    flex: 1,
+    borderRadius: SIZES.radius,
+    padding: 14,
+    alignItems: 'center',
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  secondaryBtnText: {
+    color: COLORS.dark,
+    fontWeight: FONTS.bold,
+    fontSize: SIZES.md,
+  },
+
+  primaryBtn: {
+    flex: 1,
+    borderRadius: SIZES.radius,
+    padding: 14,
+    alignItems: 'center',
+    backgroundColor: COLORS.success,
+    borderWidth: 0,
+    ...SHADOWS.card,
+  },
+  primaryBtnText: {
+    color: '#fff',
+    fontWeight: FONTS.bold,
+    fontSize: SIZES.md,
+  },});

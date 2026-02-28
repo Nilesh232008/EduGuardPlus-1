@@ -9,6 +9,28 @@ const get = async (path, token = null) => {
   return res.json();
 };
 
+const post = async (path, data, token = null) => {
+  const url = `${BASE_URL}/${path}.json${token ? `?auth=${token}` : ''}`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error(`Post failed: ${res.status}`);
+  return res.json();
+};
+
+const put = async (path, data, token = null) => {
+  const url = `${BASE_URL}/${path}.json${token ? `?auth=${token}` : ''}`;
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error(`Put failed: ${res.status}`);
+  return res.json();
+};
+
 // ─── Auth ────────────────────────────────────────────────────────────────────
 export const getUserRole = (uid, token) => get(`Users/${uid}`, token);
 
@@ -50,3 +72,15 @@ export const getAllUsers = (token) => get('Users', token);
 
 // ─── TeacherCounter ──────────────────────────────────────────────────────────
 export const getTeacherCounter = (token) => get('TeacherCounter', token);
+// ─── Write Operations ────────────────────────────────────────────────────────
+export const createTeacher = (teacherData, token) => 
+  post('Teachers', teacherData, token);
+
+export const createClass = (classData, token) => 
+  post('Classes', classData, token);
+
+export const updateClass = (classId, classData, token) => 
+  put(`Classes/${classId}`, classData, token);
+
+export const assignClassToTeacher = (classId, teacherId, token) => 
+  put(`Classes/${classId}`, { teacherId }, token);
