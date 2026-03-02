@@ -1,6 +1,6 @@
 # 🎓 EduGuard — React Native App
 
-Smart school management with **single login** and **role-based dashboards**.
+Proactive Assistants Prevent and Reduce Risk of School Dropout Students Using ML 
 
 ---
 
